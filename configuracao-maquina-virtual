@@ -1,0 +1,35 @@
+# Laboratório de Serviços de Rede com Debian 13
+
+## Etapa 01: Configuração da Máquina Virtual
+
+### Objetivo
+
+Preparar a máquina virtual que será utilizada como base para o laboratório de serviços de rede, utilizando o Debian 13 Trixie no Oracle VM VirtualBox.
+
+### Ambiente utilizado
+
+- **Virtualizador:** Oracle VM VirtualBox
+- **Nome da VM:** Debian-13
+- **Sistema operacional:** Debian 13 Trixie (64 bits)
+- **Imagem ISO:** `debian-13.7.0-amd64-DVD-1.iso`
+
+### Especificações da máquina virtual
+
+| Recurso | Configuração |
+|---|---|
+| Memória RAM | 2 GB |
+| Disco virtual | 20 GB |
+| Formato do disco | VDI |
+| Controladora de armazenamento | SATA |
+| Controladora gráfica | VMSVGA |
+| Memória de vídeo | 16 MB |
+| Adaptador de rede | Intel PRO/1000 MT Desktop |
+| Modo de rede | Bridge (adaptador em modo ponte) |
+| Adaptador físico utilizado | Placa de rede sem fio USB |
+| Pastas compartilhadas | Nenhuma configurada |
+
+### Configuração de rede
+
+O adaptador de rede virtual foi configurado no modo Bridge, permitindo que a máquina virtual se conecte à rede física por meio do adaptador de rede do computador hospedeiro.
+
+Essa configuração será utilizada para preparar e validar a conectividade do servidor Debian 13.
