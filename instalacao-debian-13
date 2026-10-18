@@ -1,0 +1,94 @@
+# Laboratório de Serviços de Rede com Debian 13
+
+## Etapa 02: Instalação do Debian 13
+
+### 1. Objetivo
+
+Instalar e configurar o Debian 13 (Trixie) na máquina virtual criada no Oracle VM VirtualBox, utilizando uma instalação mínima, sem ambiente gráfico, para servir como base do laboratório de serviços de rede.
+
+### 2. Identificação do sistema
+
+Durante a instalação, foram definidos os seguintes parâmetros:
+
+| Parâmetro | Configuração |
+|---|---|
+| Nome da máquina (hostname) | `guiga` |
+| Usuário | `guiga` |
+| Senha do root | Definida durante a instalação |
+| Senha do usuário | Definida durante a instalação |
+| Fuso horário / estado | Configurado durante a instalação |
+
+> **Nota de segurança:** as senhas não são registradas nesta documentação.
+
+### 3. Particionamento do disco
+
+Foi utilizado o particionamento manual do disco virtual de 20 GB, com sistema de arquivos ext4 para as partições principais e uma área de swap.
+
+| Tipo de partição | Tamanho | Sistema de arquivos | Ponto de montagem |
+|---|---:|---|---|
+| Primária | 8 GB | ext4 | `/` |
+| Lógica | 7,1 GB | ext4 | `/home` |
+| Lógica | 2 GB | swap | — |
+| Espaço livre | 4,4 GB | Não alocado | — |
+
+#### Descrição das partições
+
+- **`/` (raiz):** contém o sistema operacional, os arquivos de configuração, os programas instalados e os diretórios essenciais.
+- **`/home`:** armazena os diretórios pessoais dos usuários.
+- **swap:** área utilizada pelo sistema para gerenciamento de memória virtual, podendo auxiliar em situações de pressão de memória.
+- **Espaço livre:** reserva de armazenamento que permaneceu sem alocação durante o particionamento.
+
+O sistema de arquivos ext4 foi escolhido para as partições raiz e `/home`, oferecendo suporte consolidado para ambientes Linux.
+
+### 4. Configuração dos repositórios
+
+Durante a instalação, foram realizadas as seguintes escolhas:
+
+| Parâmetro | Configuração |
+|---|---|
+| Mídias adicionais | Não utilizadas |
+| Espelho de rede | Habilitado |
+| País do espelho | Brasil |
+| Servidor do repositório | `deb.debian.org` |
+| Popularity Contest | Desabilitado |
+
+O espelho de rede permite obter pacotes dos repositórios Debian pela internet, facilitando a instalação e a atualização de softwares.
+
+A opção Popularity Contest foi desabilitada, evitando a participação voluntária nesse sistema de coleta de estatísticas sobre os pacotes utilizados.
+
+### 5. Seleção de software
+
+Foi escolhida uma instalação sem ambiente gráfico.
+
+Essa decisão prioriza o uso do sistema por terminal e reduz o consumo de recursos com componentes de interface gráfica que não são necessários para a proposta do laboratório.
+
+O **servidor SSH** foi habilitado durante a seleção de software, permitindo o acesso remoto ao sistema por meio do protocolo Secure Shell, desde que o serviço esteja ativo e a conectividade de rede esteja disponível.
+
+### 6. Instalação do GRUB
+
+O carregador de inicialização GRUB foi instalado durante o processo.
+
+Sua função é permitir a inicialização do sistema operacional após o carregamento do firmware da máquina virtual.
+
+### 7. Resultado
+
+A instalação do Debian 13 foi finalizada com as configurações descritas neste documento.
+
+**Status:** instalação concluída.
+
+### 8. Considerações técnicas
+
+- A instalação sem ambiente gráfico é adequada para um servidor dedicado a serviços de rede.
+- A configuração de SSH permite administrar o sistema remotamente, mas o acesso deverá ser validado após a inicialização.
+- O espaço de armazenamento não alocado poderá ser útil para futuras necessidades, conforme a evolução do laboratório.
+- As senhas administrativas e de usuário devem ser armazenadas com segurança e nunca incluídas no repositório público.
+
+### 9. Evidências
+
+As evidências desta etapa poderão incluir capturas de tela do instalador, do particionamento manual e do primeiro acesso ao Debian 13.
+
+---
+
+**Projeto:** Laboratório de Serviços de Rede — Linux Debian 13  
+**Etapa:** Instalação do Debian 13  
+**Ambiente:** Oracle VM VirtualBox
