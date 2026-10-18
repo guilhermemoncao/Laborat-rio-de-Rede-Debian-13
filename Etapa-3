@@ -1,0 +1,128 @@
+# Etapa 03 - Preparação do ambiente Debian 13
+
+## 1. Objetivo
+
+Preparar o ambiente Debian 13 no Oracle VM VirtualBox, configurando a rede, verificando a conectividade, atualizando os repositórios e instalando ferramentas básicas. Após concluir essa preparação, foi criada uma clonagem completa da máquina virtual para servir como base do servidor `SRV-Firewall`.
+
+## 2. Configuração da máquina original
+
+Na máquina virtual Debian 13, foram executados os procedimentos de configuração e preparação do sistema, incluindo a verificação das interfaces de rede, a edição dos arquivos de configuração, os testes de conectividade e a instalação de ferramentas.
+
+### 2.1. Verificação das interfaces de rede
+
+Foi utilizado o comando abaixo para consultar as interfaces de rede e seus endereços IP:
+
+```bash
+ip a
+```
+
+### 2.2. Configuração da interface de rede
+
+O arquivo de configuração das interfaces foi aberto com o editor Nano:
+
+```bash
+nano /etc/network/interfaces
+```
+
+A configuração registrada na captura de tela foi:
+
+```text
+# The primary network interface
+auto enp0s3
+iface enp0s3 inet static
+address 192.168.20.30
+netmask 24
+network 192.168.20.0
+gateway 192.168.20.1
+```
+
+Parâmetros configurados:
+
+| Parâmetro       |
+| --------------- |
+| Interface       |
+| Configuração    |
+| Endereço IP     |
+| Máscara de rede |
+| Rede            |
+| Gateway         |
+
+Após editar o arquivo, a interface foi desativada e reativada:
+
+```bash
+ifdown enp0s3
+ifup enp0s3
+```
+
+### 2.3. Testes de conectividade
+
+Foram executados os seguintes comandos:
+
+```bash
+ping 8.8.8.8
+ping google.com
+```
+
+O teste com `8.8.8.8` verifica a conectividade com um endereço IP público. Já o teste com `google.com` também permite verificar a resolução de nomes DNS.
+
+### 2.4. Configuração dos repositórios
+
+O arquivo de configuração dos repositórios APT foi aberto:
+
+```bash
+nano /etc/apt/sources.list
+```
+
+Em seguida, foram atualizadas as listas de pacotes:
+
+```bash
+apt update
+```
+
+### 2.5. Instalação de ferramentas
+
+Foram instalados o editor Vim e as ferramentas de compilação:
+
+```bash
+apt install vim
+```
+
+```bash
+apt install make gcc g++
+```
+
+Essas ferramentas fornecem recursos para edição de arquivos, compilação de programas em C e C++ e execução de tarefas de compilação automatizadas com Make.
+
+## 3. Desligamento da máquina original
+
+Após a conclusão da configuração e da instalação das ferramentas, foi executado:
+
+```bash
+shutdown -h now
+```
+
+O comando solicita o desligamento imediato do sistema operacional.
+
+## 4. Clonagem da máquina virtual
+
+Após a instalação e configuração das ferramentas na máquina original, foi criado um **clone completo** da máquina virtual no Oracle VM VirtualBox.
+
+A clonagem foi realizada com o objetivo de preservar o ambiente preparado e utilizá-lo como base para uma máquina virtual dedicada à função de firewall.
+
+Durante esse procedimento:
+
+- Foi criado um clone completo da máquina virtual Debian 13.
+- Foram incluídos os endereços MAC das placas de rede, conforme informado durante a clonagem.
+- O nome da máquina clonada foi alterado para `SRV-Firewall`.
+
+## 5. Configuração do segundo adaptador de rede
+
+Na máquina virtual clonada, foi configurado um segundo adaptador de rede utilizando o modo **Rede Interna** do VirtualBox.
+
+Esse modo permite estabelecer comunicação entre máquinas virtuais conectadas à mesma rede interna, sem depender de uma conexão direta dessa rede com a rede física do computador hospedeiro.
+
+## 6. Resumo da etapa
+
+Nesta etapa, o Debian 13 foi preparado com configurações de rede, testes de conectividade, atualização dos repositórios APT e instalação das ferramentas Vim, Make, GCC e G++.
+
+Após a preparação da máquina original, foi criado um clone completo, renomeado para `SRV-Firewall`, e configurado um segundo adaptador de rede no modo Rede Interna do VirtualBox.
