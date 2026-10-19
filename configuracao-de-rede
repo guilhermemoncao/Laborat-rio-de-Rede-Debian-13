@@ -1,0 +1,219 @@
+# Laboratório de Serviços de Rede com Debian 13
+
+## Etapa 03: Configuração de Rede e Roteamento entre Servidor e Cliente Debian
+
+### 1. Objetivo
+
+Preparar uma máquina cliente Debian 13 com ambiente gráfico MATE, configurar a rede interna do laboratório e habilitar o encaminhamento de pacotes no servidor `SRV-Firewall`.
+
+O objetivo desta etapa foi estabelecer a comunicação entre o cliente e o servidor, permitindo testar o acesso a endereços externos e a resolução de nomes DNS.
+
+### 2. Ambiente utilizado
+
+O ambiente foi organizado com as seguintes máquinas virtuais:
+
+| Máquina | Sistema operacional | Memória RAM | Armazenamento | Rede |
+|---|---|---:|---:|---|
+| `SRV-Firewall` | Debian 13 | Não informado nesta etapa | Não informado nesta etapa | Interface externa e interface interna |
+| Cliente Debian | Debian 13 com MATE | 2 GB | 30 GB | Rede interna |
+| Cliente Windows 10 | Windows 10 | 2 GB | 40 GB | Rede interna |
+
+O cliente Windows 10 foi criado com dois núcleos de processamento e aceleração 3D habilitada. Entretanto, devido aos problemas encontrados durante sua utilização, foi decidido continuar o projeto sem essa máquina.
+
+**Escopo adotado:** servidor Debian 13 e cliente Debian 13 com MATE.
+
+### 3. Configuração do servidor SRV-Firewall
+
+#### 3.1. Alteração do nome da máquina
+
+O arquivo `/etc/hostname` foi editado com o comando:
+
+```bash
+sudo nano /etc/hostname
+```
+
+O nome configurado foi:
+
+```text
+srv-firewall
+```
+
+#### 3.2. Configuração do endereço IP
+
+A configuração das interfaces de rede foi consultada com:
+
+```bash
+ip a
+```
+
+Em seguida, o arquivo de configuração de rede foi editado:
+
+```bash
+nano /etc/network/interfaces
+```
+
+Foi configurado o endereço IP fixo `192.168.0.110` para a interface correspondente.
+
+Após as alterações, o sistema foi reiniciado:
+
+```bash
+reboot
+```
+
+> **Nota:** o endereço `192.168.0.110` foi registrado conforme informado. A associação exata desse endereço à interface externa deve ser interpretada conforme a configuração efetivamente aplicada no arquivo de rede.
+
+### 4. Configuração do cliente Debian com MATE
+
+Após acessar o sistema cliente, foi editado o arquivo de configuração das interfaces de rede:
+
+```bash
+nano /etc/network/interfaces
+```
+
+O endereço e os parâmetros de rede foram ajustados para o cenário do laboratório.
+
+#### 4.1. Renovação da configuração da interface
+
+Foram executados os seguintes comandos, considerando a interface `enp0s3`:
+
+```bash
+ip addr flush enp0s3
+ifdown enp0s3
+ifup enp0s3
+```
+
+Em seguida, a configuração das interfaces foi verificada:
+
+```bash
+ip a
+```
+
+O comando `ip addr flush enp0s3` remove os endereços IP associados à interface especificada. Os comandos `ifdown` e `ifup` desativam e reativam a interface por meio das ferramentas de configuração de rede disponíveis no sistema.
+
+**Atenção:** a remoção dos endereços IP pode interromper a conectividade da máquina. Esses comandos devem ser executados localmente ou com um método alternativo de acesso disponível.
+
+### 5. Testes de conectividade do cliente
+
+Foram realizados testes para verificar a comunicação com o servidor e com endereços externos.
+
+#### 5.1. Testes de conectividade com o gateway
+
+```bash
+ping 172.16.1.1
+ping 2001:db8:acad:cafe::1
+```
+
+Os testes foram direcionados aos endereços IPv4 e IPv6 utilizados no cenário do laboratório.
+
+O comando `ping` utiliza mensagens ICMP para verificar se um destino responde pela rede.
+
+O resultado detalhado desses testes não foi registrado nesta etapa.
+
+> **Observação:** o prefixo IPv6 `2001:db8::/32` é reservado para documentação. Portanto, o endereço informado deve ser entendido como parte de um cenário de laboratório, e não como um endereço IPv6 global destinado ao uso real na internet.
+
+### 6. Configuração de NAT e encaminhamento IPv4
+
+No servidor `SRV-Firewall`, foi configurada uma regra de NAT para permitir a tradução dos endereços de origem dos pacotes encaminhados pela interface de saída.
+
+#### 6.1. Regra de NAT com iptables
+
+Inicialmente, foi executado o comando:
+
+```bash
+iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE
+```
+
+O comando apresentou erros porque o pacote `iptables` ainda não estava instalado. Após sua instalação, o comando foi executado com sucesso.
+
+A regra utiliza:
+
+- `-t nat`: seleciona a tabela de tradução de endereços.
+- `-A POSTROUTING`: adiciona uma regra à cadeia `POSTROUTING`.
+- `-o enp0s3`: aplica a regra aos pacotes que saem pela interface especificada.
+- `-j MASQUERADE`: substitui o endereço de origem pelo endereço utilizado na interface de saída.
+
+Essa configuração permite que os clientes da rede interna compartilhem o endereço IPv4 da interface externa do servidor ao acessar redes externas, desde que o roteamento e as demais configurações estejam corretos.
+
+#### 6.2. Habilitação do encaminhamento IPv4
+
+O encaminhamento de pacotes foi habilitado temporariamente com:
+
+```bash
+echo 1 > /proc/sys/net/ipv4/ip_forward
+```
+
+Em seguida, o arquivo `/etc/sysctl.conf` foi editado:
+
+```bash
+nano /etc/sysctl.conf
+```
+
+Foi configurada a seguinte diretiva:
+
+```text
+net.ipv4.ip_forward=1
+```
+
+O parâmetro `net.ipv4.ip_forward` controla se o kernel Linux encaminha pacotes IPv4 entre interfaces de rede.
+
+A configuração pelo arquivo `/etc/sysctl.conf` foi utilizada para registrar a opção de encaminhamento no sistema. A aplicação da alteração após reinicializações depende do carregamento dessa configuração pelo mecanismo `sysctl`.
+
+#### 6.3. Verificação das regras de NAT
+
+Para consultar as regras da tabela NAT, foi executado:
+
+```bash
+iptables -t nat -L
+```
+
+Esse comando lista as cadeias e regras existentes na tabela NAT.
+
+A saída detalhada do comando não foi registrada nesta documentação.
+
+### 7. Testes de acesso externo pelo cliente Debian
+
+No cliente Debian com MATE, foram executados os seguintes testes:
+
+```bash
+ping 8.8.8.8
+ping google.com
+```
+
+O primeiro comando verifica a conectividade com um endereço IPv4 externo, sem depender de uma consulta DNS para identificar o destino.
+
+O segundo comando testa a conectividade com um nome de domínio, envolvendo também a resolução DNS.
+
+A interpretação dos resultados deve considerar:
+
+- Se `ping 8.8.8.8` responder, há evidência de conectividade IP com esse destino.
+- Se o primeiro teste funcionar e `ping google.com` falhar, pode existir um problema de resolução DNS ou de comunicação específica com o destino.
+- Se ambos falharem, devem ser verificadas as configurações de endereço IP, rota padrão, encaminhamento IPv4, NAT e regras de firewall.
+
+**Resultado:** os comandos foram executados, mas os resultados detalhados não foram informados nesta etapa. Portanto, a conectividade externa não é considerada comprovada apenas pela execução dos comandos.
+
+### 8. Decisão sobre o cliente Windows 10
+
+O cliente Windows 10 foi removido do escopo de execução do projeto devido aos problemas encontrados durante sua utilização, que estavam exigindo esforço excessivo para solucionar.
+
+A decisão foi continuar o laboratório utilizando o cliente Debian 13 com ambiente gráfico MATE.
+
+Essa alteração mantém o foco no estudo dos serviços de rede e na configuração do servidor Debian 13.
+
+### 9. Considerações de segurança
+
+- A regra `MASQUERADE` não substitui regras de filtragem de tráfego. O encaminhamento entre interfaces deve ser controlado por políticas de firewall.
+- O encaminhamento IPv4 deve ser habilitado somente quando necessário para a função de roteamento do servidor.
+- As regras adicionadas com `iptables -A` podem não persistir após uma reinicialização, dependendo da configuração de persistência do sistema.
+- O `iptables` e o `nftables` possuem mecanismos relacionados, mas não se deve presumir que regras configuradas em uma ferramenta representam toda a política de firewall do sistema.
+- Os testes de conectividade devem ser realizados apenas em redes e sistemas sob administração autorizada.
+
+### 10. Resumo da etapa
+
+Nesta etapa, foram realizadas configurações de rede no servidor `SRV-Firewall` e no cliente Debian 13 com MATE. Também foi configurada uma regra de NAT com `iptables`, habilitado o encaminhamento IPv4 e executados testes de conectividade.
+
+A execução dos comandos e a conclusão dos testes devem ser distinguidas: os resultados de `ping` e a saída detalhada das regras NAT não foram fornecidos para registro.
+
+---
+
+**Projeto:** Laboratório de Serviços de Rede — Linux Debian 13  
+**Etapa:** Configuração de Rede e Roteamento entre Servidor e Cliente Debian
